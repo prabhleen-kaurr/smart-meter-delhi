@@ -1,0 +1,29 @@
+# Sensitive Information
+.env
+server/.env
+ecocode/.env
+
+# Python specific
+__pycache__/
+*.py[cod]
+*$py.class
+server/venv/
+server/env/
+
+# Large ML Models & Data
+server/models/*.pkl
+server/*.db
+server/*.csv
+
+# Node (Frontend) specific
+ecocode/node_modules/
+ecocode/build/
+ecocode/.pnp
+.pnp.js
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.

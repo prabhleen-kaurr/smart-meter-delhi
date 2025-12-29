@@ -1,0 +1,41 @@
+name: Delhi Power Tracker Scheduler
+
+on:
+  schedule:
+    # Runs every hour (Minute 0 of every hour)
+    - cron: '0 * * * *'
+  # Allows you to manually trigger it from the "Actions" tab for testing
+  workflow_dispatch: 
+
+jobs:
+  run-scripts:
+    runs-on: ubuntu-latest
+    
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          cd server
+          pip install -r requirements.txt
+
+      - name: Run Data Collector
+        run: |
+          cd server
+          python 01_data_collector.py
+
+      - name: Run Model Trainer
+        # You might want to run this less often, but for now, we run it after collection
+        run: |
+          cd server
+          python 02_model_trainer_fast.py

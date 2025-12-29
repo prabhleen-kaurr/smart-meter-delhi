@@ -34,10 +34,18 @@ app = Flask(__name__)
 CORS(app) 
 
 # --- DATABASE CONFIGURATION ---
-db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'consumption_data.db')
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    # Fallback for local development
+    db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'consumption_data.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app) 
+db = SQLAlchemy(app)
 
 # Database Model for Consumption Data
 class Consumption(db.Model):
@@ -340,9 +348,8 @@ if __name__ == '__main__':
         
     initialize_user_data_csv()
         
-    if load_models():
-        print("Model initialization successful.")
-    else:
-        print("Warning: Models not loaded. Run 02_model_trainer_fast.py first.")
-        
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    load_models()
+    
+    # Render Port Binding
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)

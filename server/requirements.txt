@@ -11,3 +11,4 @@ python-dotenv
 groq
 Flask-SQLAlchemy
 gunicorn
+psycopg2-binary

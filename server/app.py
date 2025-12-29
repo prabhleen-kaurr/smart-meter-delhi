@@ -112,7 +112,7 @@ def get_zone_average_consumption(zone_id):
 
 def fetch_live_covariates(zone_id):
     # Use naive datetime to match the CSV format
-    start_time = datetime.now().replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+    start_time = datetime.now(IST).replace(minute=0, second=0, microsecond=0, tzinfo=None) + timedelta(hours=1)
     
     # Use 'h' instead of 'H' to fix the FutureWarning
     time_index = pd.date_range(start=start_time, periods=FORECAST_HORIZON, freq='h') 
@@ -231,7 +231,7 @@ def submit_consumption():
 
 @app.route('/api/forecast/<zone_id>', methods=['GET'])
 def get_ensemble_forecast(zone_id):
-    start_time = datetime.now()
+    start_time = datetime.now(IST).replace(tzinfo=None)
     
     if zone_id not in ZONES:
         return jsonify({"error": f"Invalid zone: {zone_id}"}), 404
@@ -241,6 +241,7 @@ def get_ensemble_forecast(zone_id):
         script_dir = os.path.dirname(os.path.abspath(__file__))
         data_path = os.path.join(script_dir, DATA_FILE)
         df_master = pd.read_csv(data_path, index_col=0, parse_dates=True)
+        df_master.index = df_master.index.tz_localize(None)
         zone_df = df_master[df_master['zone_id'] == zone_id]
         
         target_series = TimeSeries.from_dataframe(zone_df, value_cols='load_MW')

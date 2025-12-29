@@ -231,7 +231,7 @@ def submit_consumption():
 
 @app.route('/api/forecast/<zone_id>', methods=['GET'])
 def get_ensemble_forecast(zone_id):
-    start_time = datetime.now(IST)
+    start_time = datetime.now()
     
     if zone_id not in ZONES:
         return jsonify({"error": f"Invalid zone: {zone_id}"}), 404

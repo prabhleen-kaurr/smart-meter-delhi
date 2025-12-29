@@ -338,10 +338,12 @@ def get_ensemble_forecast(zone_id):
 
 @app.route('/', methods=['GET'])
 def status():
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    models_exist = all(os.path.exists(os.path.join(script_dir, MODEL_DIR, f'ensemble_model_{z}.pkl')) for z in ZONES)
     response_data = jsonify({
         "service": "ZEDF Hackathon Prototype API",
         "status": "Ready",
-        "models_loaded": len(LOADED_MODELS) == len(ZONES),
+        "models_loaded": models_exist,
         "available_zones": list(ZONES.keys()),
     })
     

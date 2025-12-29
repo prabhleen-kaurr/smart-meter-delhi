@@ -1,0 +1,638 @@
+/* ========================================================= */
+/* GLOBAL RESET & TYPOGRAPHY */
+/* ========================================================= */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', 'Arial', sans-serif;
+    background-color: #f1f3f6;
+    color: #343A40;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, p {
+    margin: 0;
+}
+
+/* Base Layout and Structure */
+.app-container {
+    min-height: 100vh;
+    animation: fadeIn 0.8s ease-out;
+}
+
+/* --- Main Header --- */
+.main-header {
+    text-align: center;
+    padding: 30px 20px;
+    background: #343A40;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+}
+
+.main-title {
+    font-size: 2em;
+    font-weight: 700;
+}
+
+.main-subtitle {
+    margin-top: 5px;
+    font-size: 1em;
+    color: #ADB5BD;
+}
+
+.main-content {
+    display: flex;
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
+}
+
+/* Footer */
+.app-footer {
+    padding: 15px;
+    text-align: center;
+    font-size: 0.8em;
+    color: #6C757D;
+    background: #E9ECEF;
+    margin-top: 30px;
+}
+
+/* --- Shared Panel Style --- */
+.panel {
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.panel-heading {
+    border-bottom: 2px solid #EEE;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 1.4em;
+    color: #343A40;
+    font-weight: 600;
+}
+
+
+/* ========================================================= */
+/* AUTHENTICATION & USER INPUT PAGES */
+/* ========================================================= */
+
+.auth-container {
+    max-width: 600px;
+    margin: 100px auto;
+    padding: 40px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.auth-title {
+    color: #007BFF;
+    margin-bottom: 30px;
+    font-size: 2em;
+}
+
+.tab-switcher {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.tab-button {
+    background: #F1F3F6;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #6C757D;
+    transition: background-color 0.3s;
+    border-radius: 6px 6px 0 0;
+}
+
+.tab-button.active {
+    background: #FFF;
+    color: #007BFF;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+    border-bottom: 3px solid #007BFF;
+}
+
+.auth-card {
+    padding: 25px;
+    border: 1px solid #E9ECEF;
+    border-radius: 8px;
+    margin-top: 10px;
+    text-align: left;
+}
+
+.card-heading {
+    font-size: 1.2em;
+    color: #343A40;
+    margin-bottom: 15px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input-field {
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.login-button {
+    padding: 12px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+.login-button:hover {
+    background-color: #0056b3;
+}
+
+.submit-button {
+    padding: 12px;
+    background-color: #28A745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.submit-button:hover {
+    background-color: #1e7e34;
+}
+
+.error-message {
+    margin-top: 10px;
+    color: #DC3545;
+    font-weight: 600;
+}
+
+
+/* USER INPUT FORM SPECIFICS */
+.user-input-container {
+    max-width: 500px;
+    margin: 80px auto;
+}
+
+
+/* ========================================================= */
+/* DASHBOARD PANEL (ADMIN VIEW) */
+/* ========================================================= */
+
+.map-panel {
+    width: 35%; 
+    min-width: 400px;
+    height: fit-content;
+    background: #f8f9fa;
+}
+
+.zone-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.zone-button {
+    color: white;
+    padding: 12px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    border: 3px solid transparent !important;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    font-size: 1em;
+}
+
+.zone-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    opacity: 0.95;
+}
+
+.zone-button.active {
+    border-width: 3px !important;
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.5);
+}
+
+/* --- Loading Box Styles --- */
+
+.loading-box {
+    margin-top: 30px;
+    padding: 15px;
+    border: 1px dashed #FFC107;
+    text-align: center;
+    border-radius: 6px;
+    color: #FFC107;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.loading-text {
+    margin: 5px 0;
+    font-size: 0.9em;
+    color: #FFC107;
+}
+
+.ready-text {
+    margin-top: 25px;
+    color: #28A745;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    background: #E3FBE7;
+    border-radius: 4px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* --- Chart Panel (Output) Styles --- */
+
+.chart-panel {
+    width: 65%;
+    animation: fadeIn 0.7s ease-out;
+}
+
+.chart-placeholder {
+    padding: 100px;
+    text-align: center;
+    font-size: 1.2em;
+    color: #ADB5BD;
+    width: 100%;
+    border: 1px dashed #ADB5BD;
+    border-radius: 8px;
+    height: 550px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #E9ECEF;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.latency-metric {
+    font-size: 1em;
+    color: #495057;
+    display: flex;
+    align-items: center;
+}
+
+/* Low-Latency Highlight Animation */
+.latency-highlight {
+    color: #006400; 
+    font-weight: bold;
+    font-size: 1.3em;
+    margin-left: 10px;
+    animation: pulse 2s infinite; 
+}
+
+.metrics-bar {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 25px;
+    background: #E9ECEF;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.metric-item {
+    font-size: 0.9em;
+    color: #343A40;
+    text-align: center;
+    padding: 0 10px;
+}
+
+.metric-item strong {
+    display: block;
+    transform: translateY(-5px);
+    font-size: 1.1em;
+}
+
+.metric-item.peak strong {
+    color: #DC3545;
+
+}
+
+
+/* ========================================================= */
+/* ANIMATION DEFINITIONS */
+/* ========================================================= */
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    /* For the Latency highlight */
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 100, 0, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(0, 100, 0, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 100, 0, 0); }
+}
+
+.spinner {
+    border: 3px solid rgba(255, 255, 255, .3);
+    border-top: 3px solid #FFC107;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px;
+}
+
+
+/* ========================================================= */
+/* LEAFLET MAP & CUSTOM OVERRIDES (CRITICAL FIXES) */
+/* ========================================================= */
+
+.leaflet-container .leaflet-overlay-pane svg g path {
+    transition: fill-opacity 0.5s ease-in-out, fill 0.5s ease-in-out, stroke 0.5s ease-in-out;
+    stroke-width: 0 !important; 
+    stroke: transparent !important;
+}
+
+.leaflet-container .leaflet-overlay-pane svg circle {
+    stroke-width: 0 !important;
+    transition: fill-opacity 0.5s ease-in-out, fill 0.5s ease-in-out;
+}
+
+/* FIX: Ensure the active zone border is always black */
+path.leaflet-interactive {
+    stroke-width: 3px !important;
+    stroke: #000 !important;
+}
+
+/* --- Custom Marker Styles (Zone Labels A, B, C) --- */
+.custom-zone-icon {
+    pointer-events: none; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.zone-label-icon {
+    background-color: #343A40;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50%;
+    font-size: 1.1em;
+    font-weight: 900;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s;
+}
+
+.zone-label-icon.selected {
+    border-color: #FFC107 !important;
+    background-color: #5baafe;
+    transform: scale(1.2);
+}
+
+
+/* --- SYSTEM STATUS BAR STYLES --- */
+
+.system-status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: -15px auto 30px auto; 
+    padding: 10px 25px;
+    background: #E9ECEF;
+    border-radius: 6px;
+    font-size: 0.9em;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* In ecocode/src/index.css */
+
+.status-item {
+    display: flex;
+    align-items: center;
+    color: #495057;
+    gap: 8px; 
+    margin-right: 10px;
+}
+
+.status-indicator {
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+    flex-shrink: 0; 
+    white-space: nowrap;
+}
+
+@keyframes blink {
+    50% { opacity: 0.4; }
+}
+
+.data-timestamp {
+    font-style: italic;
+}
+
+/* --- CHART ANALYSIS GRID STYLES --- */
+
+.analysis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.impact-box, .tft-insight-box {
+    padding: 15px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.impact-box {
+    background: #F3F9FF;
+    border-left: 5px solid #007BFF;
+}
+
+.tft-insight-box {
+    background: #FFFAF3;
+    border-left: 5px solid #FFC107;
+}
+
+.impact-box h4, .tft-insight-box h4 {
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.alert-high {
+    color: #DC3545;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.alert-low {
+    color: #28A745;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+/* --- View Switcher and Status Bar --- */
+
+.view-switcher {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.switcher-button {
+    background-color: #6C757D;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+    background-image: linear-gradient(180deg, #7c8893 0%, #5a6268 100%);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.switcher-button:hover {
+    background-image: linear-gradient(180deg, #5a6268 0%, #7c8893 100%);
+    transform: translateY(-1px);
+}
+
+.bottom-status {
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid #EEE;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-tag {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: white;
+}
+
+.status-tag.low, .status-tag.standby {
+    background-color: #28A745;
+}
+
+.status-tag.medium {
+    background-color: #007BFF;
+}
+
+.status-tag.high {
+    background-color: #FFC107;
+    color: #343A40;
+}
+
+.status-tag.critical {
+    background-color: #DC3545;
+}
+
+.impact-box h4 {
+    color: #007BFF;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+.impact-value {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #343A40;
+    margin-bottom: 5px;
+}
+
+.alert-neutral {
+    color: #495057;
+    font-weight: bold;
+}
+
+.analysis-grid-3-col {
+    grid-template-columns: 1fr 1fr 1fr !important; 
+}
+
+.risk-assessment-box {
+    background: #FFFAFA; 
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #F8D7DA;
+    box-shadow: inset 0 0 5px rgba(220, 53, 69, 0.1);
+}
+
+.risk-assessment-box h4 {
+    color: #DC3545; 
+    border-bottom: 1px solid #F8D7DA;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+@media (max-width: 1200px) {
+    .main-content {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .map-panel, .chart-panel {
+        width: 100%; 
+        min-width: auto;
+    }
+    
+    .analysis-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 650px) {
+    .analysis-grid {
+        grid-template-columns: 1fr; 
+    }
+    
+    .system-status-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+}

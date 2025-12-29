@@ -1,5 +1,9 @@
 name: Delhi Power Tracker Scheduler
 
+# In scheduler.yml
+env:
+  TZ: "Asia/Kolkata"
+
 on:
   schedule:
     # Runs every hour (Minute 0 of every hour)
@@ -39,3 +43,11 @@ jobs:
         run: |
           cd server
           python 02_model_trainer_fast.py
+
+      - name: Commit and Push Updated Models
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "actions@github.com"
+          git add server/models/*.pkl
+          git commit -m "Auto-update trained models [skip ci]" || echo "No changes to models"
+          git push

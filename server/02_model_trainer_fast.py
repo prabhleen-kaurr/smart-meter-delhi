@@ -5,8 +5,14 @@ from darts import TimeSeries
 from darts.models import BlockRNNModel, TFTModel, RegressionEnsembleModel
 from sklearn.linear_model import Ridge
 from dotenv import load_dotenv
+import pytz
+from datetime import datetime
 
+IST = pytz.timezone('Asia/Kolkata')
 load_dotenv()
+
+def get_now_ist():
+    return datetime.now(IST)
 
 # --- Configuration (Adjusted for Speed) ---
 DATA_FILE = 'master_load_weather_data.csv'
@@ -21,6 +27,10 @@ RANDOM_STATE = 42
 
 def load_and_prepare_data():
     df = pd.read_csv(DATA_FILE, index_col=0, parse_dates=True)
+    if df.index.tz is None:
+        df.index = df.index.tz_localize('UTC').tz_convert(IST)
+    else:
+        df.index = df.index.tz_convert(IST)
     all_series = {}
     
     COVARIATE_COLS = ['temp_C', 'humidity', 'wind_speed', 'hour', 'day_of_week', 'is_weekend']
@@ -51,10 +61,9 @@ def create_base_learner(model_type, zone_name):
     common_params = {
         'input_chunk_length': INPUT_CHUNK_LENGTH,
         'output_chunk_length': FORECAST_HORIZON,
-        'n_epochs': N_EPOCHS,
+        'n_epochs': 2,
         'batch_size': 32,
-        'random_state': RANDOM_STATE,
-        'model_name': f'BASE_MODEL_TEMPLATE', 
+        'random_state': 42,
         'force_reset': True,
         'pl_trainer_kwargs': pl_trainer_kwargs
     }

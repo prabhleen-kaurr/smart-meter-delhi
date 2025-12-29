@@ -4,6 +4,10 @@ import requests
 import os
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+import pytz
+from datetime import datetime
+
+IST = pytz.timezone('Asia/Kolkata')
 
 load_dotenv()
 
@@ -35,7 +39,7 @@ def fetch_historical_open_meteo(lat, lon, days=HISTORICAL_DAYS):
 
     hourly = response['hourly']
     df = pd.DataFrame({
-        'timestamp': pd.to_datetime(hourly['time']),
+        'timestamp': datetime.now(IST),
         'temp_C': hourly['temperature_2m'],
         'humidity': hourly['relative_humidity_2m'],
         'wind_speed': hourly['wind_speed_10m']

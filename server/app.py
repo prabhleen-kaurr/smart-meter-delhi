@@ -9,7 +9,10 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from flask_sqlalchemy import SQLAlchemy 
 from groq import Groq 
+import pytz
+from datetime import datetime
 
+IST = pytz.timezone('Asia/Kolkata')
 load_dotenv()
 
 # --- Configuration and State ---
@@ -108,9 +111,12 @@ def get_zone_average_consumption(zone_id):
 
 
 def fetch_live_covariates(zone_id):
-    """Simulates fetching the 24-hour forecast covariates (future weather)."""
+    # Use naive datetime to match the CSV format
     start_time = datetime.now().replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
-    time_index = pd.date_range(start=start_time, periods=FORECAST_HORIZON, freq='H') 
+    
+    # Use 'h' instead of 'H' to fix the FutureWarning
+    time_index = pd.date_range(start=start_time, periods=FORECAST_HORIZON, freq='h') 
+    
     forecast_df = pd.DataFrame({
         'temp_C': 30 + 5 * np.sin(2 * np.pi * np.arange(FORECAST_HORIZON) / 24),
         'humidity': 60 + 10 * np.cos(2 * np.pi * np.arange(FORECAST_HORIZON) / 24),
@@ -209,7 +215,7 @@ def submit_consumption():
     
     try:
         new_data = pd.DataFrame([{
-            'timestamp': datetime.utcnow(),
+            'timestamp': datetime.now(IST),
             'zone_id': zone_id,
             'consumer_code': consumer_code,
             'units_consumed': units_consumed
@@ -225,7 +231,7 @@ def submit_consumption():
 
 @app.route('/api/forecast/<zone_id>', methods=['GET'])
 def get_ensemble_forecast(zone_id):
-    start_time = datetime.now()
+    start_time = datetime.now(IST)
     
     if zone_id not in ZONES:
         return jsonify({"error": f"Invalid zone: {zone_id}"}), 404
@@ -320,7 +326,9 @@ def get_ensemble_forecast(zone_id):
             }
         }
         
-        return jsonify(forecast_output), 200
+        response = jsonify(forecast_output)
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        return response, 200
 
     except Exception as e:
         print(f"\nFATAL CRASH in API logic: {type(e).__name__}: {str(e)}")

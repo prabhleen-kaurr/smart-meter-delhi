@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { fetchForecast } from '../api';
-import ZoneMapDisplay from './ZoneMapDisplay'; // NEW IMPORT
+import ZoneMapDisplay from './ZoneMapDisplay'; 
 import '../index.css'; 
 
 const ZONES = [
@@ -12,7 +12,7 @@ const ZONES = [
 const MapPanel = ({ setForecastData, setZoneId, forecastData }) => {
   const [loading, setLoading] = useState(false);
   const [selectedZone, setSelectedZone] = useState(null);
-  const [viewMode, setViewMode] = useState('buttons'); // NEW STATE: 'buttons' or 'map'
+  const [viewMode, setViewMode] = useState('buttons'); 
 
   const handleForecastFetch = async (zoneId) => {
     setLoading(true);
@@ -27,7 +27,6 @@ const MapPanel = ({ setForecastData, setZoneId, forecastData }) => {
         setForecastData(apiResponse);
       } else {
         console.error(`Backend Error for ${zoneId}:`, apiResponse.details);
-        // Fallback: Display simple message on crash
         setForecastData({ error: true, message: apiResponse.details || "Backend crash, check server terminal." });
       }
     } catch (e) {
@@ -51,7 +50,6 @@ const MapPanel = ({ setForecastData, setZoneId, forecastData }) => {
   const currentStatus = getDemandStatus();
 
 
-  // --- Render Logic: Switch between Button View and Map View ---
   const renderContent = () => {
     if (viewMode === 'map') {
       return (
@@ -64,7 +62,6 @@ const MapPanel = ({ setForecastData, setZoneId, forecastData }) => {
       );
     }
     
-    // Default Button View
     return (
       <div className="zone-container">
         <p className="panel-subtext">Click a button to generate the 24-hour prediction:</p>
@@ -93,7 +90,6 @@ const MapPanel = ({ setForecastData, setZoneId, forecastData }) => {
         {viewMode === 'map' ? 'Geospatial Load Map' : 'Direct Zone Selection'}
       </h3>
       
-      {/* View Switcher Toggle */}
       <div className="view-switcher">
         <button 
             className="switcher-button" 
@@ -105,7 +101,6 @@ const MapPanel = ({ setForecastData, setZoneId, forecastData }) => {
 
       {renderContent()}
       
-      {/* Bottom Status Bar */}
       <div className="bottom-status">
         <p style={{ fontWeight: 'bold' }}>Current Demand Status:</p>
         <span className={`status-tag ${currentStatus.toLowerCase()}`}>
@@ -113,7 +108,6 @@ const MapPanel = ({ setForecastData, setZoneId, forecastData }) => {
         </span>
       </div>
 
-      {/* Loading Feedback (Shared for both modes) */}
       {loading && (
         <div className="loading-box">
           <div className="spinner"></div>

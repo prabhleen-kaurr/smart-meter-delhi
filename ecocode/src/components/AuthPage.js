@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import '../index.css'; 
 import UserInput from './UserInput';
 
-const ADMIN_KEY = "GRIDMANAGER25"; // Hardcoded Admin Password for hackathon
+const ADMIN_KEY = "GRIDMANAGER25"; 
 
 const AuthPage = ({ onLogin }) => {
   const [activeTab, setActiveTab] = useState('user');
@@ -19,7 +19,6 @@ const AuthPage = ({ onLogin }) => {
   };
 
   const handleUserLogin = () => {
-    // User is immediately routed to the data entry form
     onLogin('user');
   };
 

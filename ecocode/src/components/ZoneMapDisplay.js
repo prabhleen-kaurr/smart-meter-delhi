@@ -1,5 +1,3 @@
-// ecocode/src/components/ZoneMapDisplay.js
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Tooltip, CircleMarker, GeoJSON } from 'react-leaflet';
 import { renderToStaticMarkup } from 'react-dom/server'; 
@@ -7,7 +5,6 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import '../index.css'; 
 
-// Fix for default Leaflet icon paths in React
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
@@ -15,14 +12,12 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
 
-// Define the geographical center coordinates for the labels (markers)
 const ZONE_CENTERS = {
     'Zone_A': [28.62, 77.1], 
     'Zone_B': [28.5, 77.2],  
     'Zone_C': [28.68, 77.3], 
 };
 
-// Mock GeoJSON data (kept for click areas)
 const DELHIZONES_GEOJSON = {
   type: "FeatureCollection",
   features: [
@@ -35,23 +30,19 @@ const DELHIZONES_GEOJSON = {
   ]
 };
 
-const INITIAL_VIEW = [28.6, 77.2]; // Center of Delhi
-
-// Define strategic points for the overlapping gradient effect (FIXED AND CENTERED)
+const INITIAL_VIEW = [28.6, 77.2];
 const GRADIENT_POINTS = [
-    { center: [28.6, 77.2], radius: 60000, key: 'g1', factor: 0.8 }, // Main Central point (Largest)
-    { center: [28.5, 77.15], radius: 45000, key: 'g2', factor: 0.6 }, // South-West point
-    { center: [28.75, 77.25], radius: 35000, key: 'g3', factor: 0.4 }, // Far North point
+    { center: [28.6, 77.2], radius: 60000, key: 'g1', factor: 0.8 }, 
+    { center: [28.5, 77.15], radius: 45000, key: 'g2', factor: 0.6 },
+    { center: [28.75, 77.25], radius: 35000, key: 'g3', factor: 0.4 },
 ];
 
-
-// Define a color scale function for the gradient effect
 const getColor = (status) => {
     switch (status) {
-        case 'critical': return '#E30000'; // Deep Red
-        case 'high':     return '#FF8C00'; // Orange
-        case 'medium':   return '#00BFFF'; // Deep Sky Blue
-        case 'low':      return '#28A745'; // Green
+        case 'critical': return '#E30000'; 
+        case 'high':     return '#FF8C00'; 
+        case 'medium':   return '#00BFFF'; 
+        case 'low':      return '#28A745'; 
         default:         return '#999999';
     }
 }
@@ -61,8 +52,7 @@ const ZoneMapDisplay = ({ onZoneSelect, loading, forecastData, selectedZoneId })
     const [cityDemandStatus, setCityDemandStatus] = useState('low'); 
     const [cityLoadAvg, setCityLoadAvg] = useState(1000); 
 
-    // Effect to calculate overall city status
-    useEffect(() => {
+   useEffect(() => {
         if (forecastData && forecastData.predictions) {
             const { predictions, zone_id } = forecastData;
             const avgLoad = predictions.length > 0 
@@ -71,7 +61,6 @@ const ZoneMapDisplay = ({ onZoneSelect, loading, forecastData, selectedZoneId })
             
             setCityLoadAvg(avgLoad);
             
-            // Adjusting thresholds based on the simulated load data range (MWs)
             let status = 'low';
             if (avgLoad > 1400) status = 'critical'; 
             else if (avgLoad > 1200) status = 'high'; 
@@ -83,25 +72,22 @@ const ZoneMapDisplay = ({ onZoneSelect, loading, forecastData, selectedZoneId })
         }
     }, [forecastData]);
 
-    // Calculate opacity based on load for the visual gradient (0.3 to 0.8)
     const baseLoad = 800;
     const maxLoad = 1600;
     const normalizedLoad = Math.min(1, Math.max(0, (cityLoadAvg - baseLoad) / (maxLoad - baseLoad)));
-    const gradientOpacityBase = 0.3 + (normalizedLoad * 0.5); // Range from 0.3 to 0.8
+    const gradientOpacityBase = 0.3 + (normalizedLoad * 0.5); 
 
 
-    // Styling function for GeoJSON polygons (used only for invisible click areas)
     const styleZone = (feature) => {
         return {
             fillColor: 'transparent',
-            weight: 0, // No border
+            weight: 0, 
             opacity: 0,
             color: 'transparent', 
             fillOpacity: 0
         };
     };
 
-    // Function to handle map interaction (click listener on GeoJSON)
     const onEachFeature = (feature, layer) => {
         layer.on({
             click: (e) => {
@@ -111,7 +97,6 @@ const ZoneMapDisplay = ({ onZoneSelect, loading, forecastData, selectedZoneId })
         });
     };
     
-    // Custom JSX to render inside the Marker (Zone Labels)
     const createZoneIcon = (label, id) => {
         const isSelected = id === selectedZoneId;
         const html = renderToStaticMarkup(
@@ -127,7 +112,7 @@ const ZoneMapDisplay = ({ onZoneSelect, loading, forecastData, selectedZoneId })
         <div style={{ position: 'relative', height: '400px', width: '100%', marginBottom: '15px' }}>
             <MapContainer 
                 center={INITIAL_VIEW} 
-                zoom={10} // Adjusted zoom level to fit the wider area
+                zoom={10} 
                 scrollWheelZoom={false} 
                 style={{ height: '100%', borderRadius: '8px' }}
             >
@@ -136,30 +121,26 @@ const ZoneMapDisplay = ({ onZoneSelect, loading, forecastData, selectedZoneId })
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
                 
-                {/* 1. RENDER OVERLAPPING CIRCLES FOR GRADIENT EFFECT */}
                 {GRADIENT_POINTS.map((point) => (
                     <CircleMarker
                         key={point.key}
                         center={point.center}
-                        radius={point.radius / 10} // Radius must be in meters, adjusted factor here
+                        radius={point.radius / 10} 
                         pathOptions={{
                             fillColor: getColor(cityDemandStatus), 
-                            color: 'transparent', // No border on gradient circles
+                            color: 'transparent', 
                             weight: 0,
-                            // Dynamic opacity: Fades out based on distance/factor
                             fillOpacity: gradientOpacityBase * point.factor, 
                         }}
                     />
                 ))}
 
-                {/* 2. RENDER ZONE POLYGONS (Invisible, for click areas only) */}
                 <GeoJSON 
                     data={DELHIZONES_GEOJSON}
                     style={styleZone} 
                     onEachFeature={onEachFeature} 
                 />
                 
-                {/* 3. RENDER CLICKABLE ZONE MARKERS (A, B, C) */}
                 {Object.keys(ZONE_CENTERS).map(id => (
                     <Marker 
                         key={id}
@@ -176,7 +157,6 @@ const ZoneMapDisplay = ({ onZoneSelect, loading, forecastData, selectedZoneId })
 
             </MapContainer>
             
-            {/* Loading Overlay */}
             {loading && (
                 <div className="map-loading-overlay">
                     <div className="spinner"></div>

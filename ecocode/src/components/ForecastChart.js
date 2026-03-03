@@ -21,7 +21,6 @@ const ForecastChart = ({ data, zoneId }) => {
     );
   }
 
-  // --- Data Transformation & Logic ---
   const loadValues = data.predictions.map(p => p.load_mw);
   const solarValues = data.predictions.map(p => p.solar_mw || 0);
   const labels = data.predictions.map(p => new Date(p.timestamp).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }));
@@ -33,7 +32,6 @@ const ForecastChart = ({ data, zoneId }) => {
   const requiredMargin = data.base_model_contributions.required_capacity_margin || 0; 
   const peakSolarOffset = data.base_model_contributions.peak_solar_offset; 
   
-  // Simulated TFT Interpretation Logic
   const peakTime = labels[loadValues.indexOf(Math.max(...loadValues))];
   
   const getInterpretation = () => {
@@ -42,28 +40,23 @@ const ForecastChart = ({ data, zoneId }) => {
       const peakHour = new Date(data.predictions[peakHourIndex].timestamp).getHours();
       const deviation = Math.max(...loadValues) / loadAvg;
 
-      // Rule 1: High Deviation during midday (HVAC/Industrial)
       if (deviation > 1.25 && peakHour >= 12 && peakHour <= 17) {
           return `Primary Driver: <strong>Afternoon Heat (HVAC)</strong>. Strong demand expected between ${peakHour}:00 and 17:00 due to high solar gain and cooling load.`;
       }
       
-      // Rule 2: High Deviation during evening/night (Residential/Lighting)
       if (deviation > 1.2 && peakHour >= 18 && peakHour <= 22) {
           return `Primary Driver: <strong>Residential Evening Peak</strong>. Load driven by residential returns, cooking, and lighting; requires stable capacity management.`;
       }
       
-      // Rule 3: General Stable Case
       return `Primary Driver: <strong>Base Load Stability</strong>. Prediction shows minimal volatility; weather and temporal factors are balanced.`;
   };
 
-  // --- Calculate currentStatus based on average load ---
   const avgLoad = loadValues.reduce((sum, p) => sum + p, 0) / loadValues.length;
   let currentStatus = 'medium';
   if (avgLoad > 1400) currentStatus = 'critical'; 
   else if (avgLoad > 1200) currentStatus = 'high'; 
   else if (avgLoad > 900) currentStatus = 'medium'; 
   else currentStatus = 'low'; 
-  // --- END FIX ---
 
 
   const chartData = {
@@ -80,7 +73,7 @@ const ForecastChart = ({ data, zoneId }) => {
         fill: true, 
       },
       {
-        label: 'Solar Generation Offset (MW)', // NEW DATASET
+        label: 'Solar Generation Offset (MW)', 
         data: solarValues,
         borderColor: '#FFC107', 
         backgroundColor: 'rgba(255, 193, 7, 0.4)',
@@ -159,11 +152,9 @@ const ForecastChart = ({ data, zoneId }) => {
         <div className="tft-insight-box">
             <h4>TFT Interpretability (Insight)</h4>
             
-            {/* FIX 1: Use dangerouslySetInnerHTML for bolding and structure */}
             <p className="insight-text" dangerouslySetInnerHTML={{ __html: getInterpretation() }}></p>
             
             <p style={{marginTop: '10px'}}>
-                {/* FIX 2: Correctly apply visual alert logic for Festival Impact */}
                 <strong style={{color: festivalImpact !== 'None (Standard Day)' ? '#DC3545' : '#28A745'}}>
                     {festivalImpact !== 'None (Standard Day)' ? '🚨 ALERT (Domain Factor):' : 'Status (Domain Factor):'}
                 </strong> {festivalImpact}

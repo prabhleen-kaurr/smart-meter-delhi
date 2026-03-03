@@ -14,7 +14,6 @@ load_dotenv()
 def get_now_ist():
     return datetime.now(IST)
 
-# --- Configuration (Adjusted for Speed) ---
 DATA_FILE = 'master_load_weather_data.csv'
 MODEL_DIR = 'models/'
 ZONES = ['Zone_A', 'Zone_B', 'Zone_C']
@@ -22,8 +21,6 @@ FORECAST_HORIZON = 24
 INPUT_CHUNK_LENGTH = 72
 N_EPOCHS = 3
 RANDOM_STATE = 42
-
-# --- Data Loading and Preparation ---
 
 def load_and_prepare_data():
     df = pd.read_csv(DATA_FILE, index_col=0, parse_dates=True)
@@ -51,8 +48,6 @@ def load_and_prepare_data():
             'val_covariates': covariate_series[split_point:]
         }
     return all_series
-
-# --- Model Definition and Training ---
 
 def create_base_learner(model_type, zone_name):
     
@@ -146,7 +141,9 @@ def train_and_save_ensemble(zone, data):
     joblib.dump(stacking_model, os.path.join(model_dir_path, f'ensemble_model_{zone}.pkl'))
     print(f"  ✅ Ensemble Model saved for {zone}. (Total models stacked: {len(trained_models)})")
 
-# --- Main Execution ---
+
+
+
 
 if __name__ == '__main__':
     DATA_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), DATA_FILE)

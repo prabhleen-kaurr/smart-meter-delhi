@@ -9,7 +9,6 @@ const RISK_FACTORS = [
 ];
 
 const RiskAssessmentBox = ({ currentStatus }) => {
-    // Determine overall risk level (High, Medium, or Low)
     const isCritical = currentStatus === 'critical';
     const isHigh = currentStatus === 'high';
 
@@ -20,9 +19,9 @@ const RiskAssessmentBox = ({ currentStatus }) => {
     };
 
     const getRiskColor = (riskLevel) => {
-        if (riskLevel === 'High Risk') return '#DC3545'; // Red
-        if (riskLevel === 'Medium Risk') return '#FFC107'; // Yellow
-        return '#28A745'; // Green
+        if (riskLevel === 'High Risk') return '#DC3545'; 
+        if (riskLevel === 'Medium Risk') return '#FFC107'; 
+        return '#28A745'; 
     };
 
     return (

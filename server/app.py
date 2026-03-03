@@ -15,7 +15,7 @@ from datetime import datetime
 IST = pytz.timezone('Asia/Kolkata')
 load_dotenv()
 
-# --- Configuration and State ---
+
 API_KEYS = {
     'GROQ_API_KEY': os.environ.get('GROQ_API_KEY', 'YOUR_GROQ_API_KEY_IS_MISSING'),
     'OPEN_METEO_KEY': os.environ.get('OPEN_METEO_KEY', 'NO_KEY_NEEDED_FOR_FREE_TIER')
@@ -27,30 +27,22 @@ ZONES = {'Zone_A': (28.632, 77.218), 'Zone_B': (28.524, 77.185), 'Zone_C': (28.7
 FORECAST_HORIZON = 24
 INPUT_CHUNK_LENGTH = 72
 LOADED_MODELS = {}
+SYSTEM_CAPACITY_MW = 1800 
 
-# --- NEW GLOBAL CONSTANT ---
-SYSTEM_CAPACITY_MW = 1800 # Define system capacity for margin calculation
-# ---------------------------
-
-# --- Initialize Flask and CORS ---
 app = Flask(__name__)
 CORS(app) 
 
-# --- DATABASE CONFIGURATION ---
 database_url = os.environ.get('DATABASE_URL')
 if database_url:
     if database_url.startswith("postgres://"):
         database_url = database_url.replace("postgres://", "postgresql://", 1)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 else:
-    # Fallback for local development
     db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'consumption_data.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-
-# Database Model for Consumption Data
 class Consumption(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
@@ -61,10 +53,6 @@ class Consumption(db.Model):
     def __repr__(self):
         return f'<Consumption {self.zone_id} [{self.consumer_code}]: {self.units_consumed} kWh>'
 
-
-# --- UTILITY FUNCTIONS ---
-
-# Domain-Specific Factor Lookup (Used for Festival Alert)
 FESTIVAL_FACTORS = {
     (10, 28): "High Spike (Diwali/Festive Lighting)",
     (1, 1): "Medium Spike (New Year/Holiday)",
@@ -103,7 +91,6 @@ def get_zone_average_consumption(zone_id):
         df = pd.read_csv(USER_DATA_FILE)
         zone_data = df[df['zone_id'] == zone_id]
         if zone_data.empty: return 800.0
-        # Use np.nan_to_num to guarantee output is a clean float
         mean_value = zone_data['units_consumed'].mean()
         return float(np.nan_to_num(mean_value))
     except Exception:
@@ -111,10 +98,7 @@ def get_zone_average_consumption(zone_id):
 
 
 def fetch_live_covariates(zone_id):
-    # Use naive datetime to match the CSV format
     start_time = datetime.now(IST).replace(minute=0, second=0, microsecond=0, tzinfo=None) + timedelta(hours=1)
-    
-    # Use 'h' instead of 'H' to fix the FutureWarning
     time_index = pd.date_range(start=start_time, periods=FORECAST_HORIZON, freq='h') 
     
     forecast_df = pd.DataFrame({
@@ -145,8 +129,6 @@ def get_groq_ai_insight(zone_id, forecast_covariates):
     
     try:
         client = Groq(api_key=API_KEYS['GROQ_API_KEY'])
-        
-        # Access data via stable NumPy values and manual dictionary construction
         weather_values = forecast_covariates.values()[-1].flatten()
         weather_columns = ['temp_C', 'humidity', 'wind_speed', 'hour', 'day_of_week', 'is_weekend']
         latest_weather_dict = dict(zip(weather_columns, weather_values))
@@ -169,7 +151,6 @@ def get_groq_ai_insight(zone_id, forecast_covariates):
     except Exception as e:
         return get_simulated_ai_insight(zone_id)
 
-# --- NEW UTILITY FUNCTION FOR RISK ASSESSMENT ---
 def get_risk_assessment_text(final_prediction_array):
     """
     Simulates the risk assessment output based on the predicted load array.
@@ -198,10 +179,6 @@ def get_risk_assessment_text(final_prediction_array):
         risk_data["Feeder Overload and Tripping"] = "Low Risk"
         
     return risk_data
-# --- END NEW UTILITY FUNCTION ---
-
-
-# --- API ENDPOINTS ---
 
 @app.route('/api/submit_consumption', methods=['POST'])
 def submit_consumption():
@@ -237,7 +214,6 @@ def get_ensemble_forecast(zone_id):
         return jsonify({"error": f"Invalid zone: {zone_id}"}), 404
 
     try:
-        # 1. Load Data
         script_dir = os.path.dirname(os.path.abspath(__file__))
         data_path = os.path.join(script_dir, DATA_FILE)
         df_master = pd.read_csv(data_path, index_col=0, parse_dates=True)
@@ -245,15 +221,9 @@ def get_ensemble_forecast(zone_id):
         zone_df = df_master[df_master['zone_id'] == zone_id]
         
         target_series = TimeSeries.from_dataframe(zone_df, value_cols='load_MW')
-        
-        # 2. Get Future Covariates and Festival Status
-        future_covariates_forecast = fetch_live_covariates(zone_id)
-        
+        future_covariates_forecast = fetch_live_covariates(zone_id)        
         forecast_date = future_covariates_forecast.time_index[0].to_pydatetime()
         festival_status = get_festival_factor(forecast_date)
-
-        # 3. GENERATE SIMULATED PREDICTION 
-        # FIX APPLIED: Initialize required_margin before calculation block
         required_margin = 0.0
         
         last_known_load = float(target_series.values()[-1][0]) if target_series.n_timesteps > 0 else 1000.0
@@ -264,7 +234,6 @@ def get_ensemble_forecast(zone_id):
         if festival_status != "None (Standard Day)":
             festival_boost = 1.25 
         
-        # Accessing features via stable time_index
         forecast_hours = future_covariates_forecast.time_index.hour.values
 
         time_based_impact = np.ones(FORECAST_HORIZON, dtype=float)
@@ -287,24 +256,18 @@ def get_ensemble_forecast(zone_id):
         final_prediction = simulated_prediction
         final_prediction[final_prediction < 0] = 0
         
-        # Calculate Required Margin based on Peak Load
         peak_load = np.max(final_prediction)
-        required_margin = SYSTEM_CAPACITY_MW - peak_load # Now this calculation is safe.
+        required_margin = SYSTEM_CAPACITY_MW - peak_load 
         
-        # 4. Get AI Insight (The most stable part is the local simulation)
         groq_insight = get_groq_ai_insight(zone_id, future_covariates_forecast)
         
-        # 5. Final Formatting
         end_time = datetime.now()
         elapsed_time_ms = (end_time - start_time).total_seconds() * 1000
 
         pred_time_index = future_covariates_forecast.time_index
 
-        # 6. Risk Assessment (Needs prediction array)
         risk_assessment = get_risk_assessment_text(final_prediction)
 
-        # 7. Format and Return Results
-        # Ensure all metrics are explicitly protected against NaN/None
         final_avg_load = float(np.nan_to_num(np.mean(final_prediction)))
         final_user_avg = get_zone_average_consumption(zone_id) 
 
@@ -322,7 +285,6 @@ def get_ensemble_forecast(zone_id):
                 "groq_insight": groq_insight,
                 "festival_impact": festival_status,
                 "risk_assessment": risk_assessment,
-                # FIX: required_capacity_margin is now correctly defined here
                 "required_capacity_margin": round(np.nan_to_num(required_margin), 2)
             }
         }
@@ -333,7 +295,6 @@ def get_ensemble_forecast(zone_id):
 
     except Exception as e:
         print(f"\nFATAL CRASH in API logic: {type(e).__name__}: {str(e)}")
-        # If any part of the simulation fails, return a detailed error.
         return jsonify({"error": "Forecast calculation failed.", "details": str(e)}), 500
 
 @app.route('/', methods=['GET'])
@@ -351,7 +312,7 @@ def status():
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
-# --- MAIN EXECUTION ---
+
 
 if __name__ == '__main__':
     with app.app_context():
@@ -361,6 +322,5 @@ if __name__ == '__main__':
         
     load_models()
     
-    # Render Port Binding
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)

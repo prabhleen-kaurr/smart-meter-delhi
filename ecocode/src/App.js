@@ -9,7 +9,6 @@ import './index.css';
 const App = () => {
   const [forecastData, setForecastData] = useState(null);
   const [zoneId, setZoneId] = useState(null);
-  // User state: 'unauthenticated', 'user_input', 'admin_dashboard'
   const [authState, setAuthState] = useState('unauthenticated'); 
 
   const handleLogin = (role) => {
@@ -20,17 +19,14 @@ const App = () => {
     }
   };
   
-  // RENDER LOGIC
   if (authState === 'unauthenticated') {
     return <AuthPage onLogin={handleLogin} />;
   }
 
   if (authState === 'user_input') {
-    // After user submits data, they return to the AuthPage
     return <UserInput onSubmissionSuccess={() => setAuthState('unauthenticated')} />;
   }
 
-  // Admin Dashboard View (authState === 'admin_dashboard')
   return (
     <div className="app-container">
       <header className="main-header">

@@ -27,7 +27,6 @@ const SystemStatus = () => {
             }
         };
 
-        // Check immediately and then poll every 10 seconds
         checkStatus();
         const interval = setInterval(checkStatus, 10000); 
         
